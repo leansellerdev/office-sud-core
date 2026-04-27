@@ -8,7 +8,6 @@ from pydoll.exceptions import ElementNotFound
 from core.browser.constants.selectors import LoginPageSelectors
 from core.browser.pages.base import OfficeSudBase
 from core.models import SetupParams
-from settings import PATH
 
 
 class LoginPage(OfficeSudBase):
@@ -70,6 +69,6 @@ class LoginPage(OfficeSudBase):
         # await self.creds_login(tab)
         await self.select_eds(
             tab,
-            nca_path=str(PATH / self.params.auth_params.nca_path),
+            nca_path=str(self.params.auth_params.nca_path),
             password=self.params.auth_params.nca_password,
         )

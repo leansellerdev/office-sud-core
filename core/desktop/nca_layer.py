@@ -1,4 +1,6 @@
+import os
 from datetime import datetime, timedelta
+from pathlib import Path
 
 import pyautogui
 from loguru import logger
@@ -11,7 +13,8 @@ from pywinauto import (
 )
 from pywinauto.application import ProcessNotFoundError
 
-from settings import IMAGES_DIR, nca_layer_path, open_jdk_path
+APPDATA = os.getenv("APPDATA", "")
+IMAGES_DIR = Path("images")
 
 
 class Desktop:
@@ -42,11 +45,19 @@ class NCALayer(Desktop):
     def __init__(self) -> None:
         super().__init__()
 
+    @property
+    def nca_layer_path(self) -> str:
+        return os.path.join(APPDATA, r"NCALayer\NCALayer.exe")
+
+    @property
+    def open_jdk_path(self) -> str:
+        return os.path.join(APPDATA, r"NCALayer\jre\bin\javaw.exe")
+
     def start(self) -> None:
-        if not self._check_if_started(nca_layer_path) or not self._check_if_started(
-            open_jdk_path
-        ):
-            self.app.start(nca_layer_path)
+        if not self._check_if_started(
+            self.nca_layer_path
+        ) or not self._check_if_started(self.open_jdk_path):
+            self.app.start(self.nca_layer_path)
             self.logger.info("NCALayer запущен.")
 
             return
@@ -54,14 +65,14 @@ class NCALayer(Desktop):
         self.logger.warning("NCALayer уже запущен!")
 
     def close(self) -> None:
-        if not self._check_if_started(open_jdk_path):
+        if not self._check_if_started(self.open_jdk_path):
             return
 
         self.app.kill()
 
     async def choose_key(self, nca_path: str, password: str, /, timeout: int = 10):
         key_list_window = await self._wait_window_to_appear(
-            "Список ключей", open_jdk_path, timeout=timeout, raise_exc=False
+            "Список ключей", self.open_jdk_path, timeout=timeout, raise_exc=False
         )
         if key_list_window is not None:
             continue_button = pyautogui.locateOnScreen(
@@ -72,13 +83,13 @@ class NCALayer(Desktop):
                 pyautogui.click(center)
         else:
             await self._wait_window_to_appear(
-                "Открыть файл", open_jdk_path, timeout=timeout
+                "Открыть файл", self.open_jdk_path, timeout=timeout
             )
             keyboard.send_keys(nca_path, pause=0)
             keyboard.send_keys("{ENTER}")
 
         await self._wait_window_to_appear(
-            "Формирование ЭЦП в формате XML", open_jdk_path, timeout=timeout
+            "Формирование ЭЦП в формате XML", self.open_jdk_path, timeout=timeout
         )
         keyboard.send_keys(password, pause=0)
         keyboard.send_keys("{ENTER 2}", pause=1)
