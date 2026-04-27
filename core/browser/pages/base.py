@@ -4,18 +4,14 @@ from typing import Type
 from loguru import logger
 from pydoll.browser.tab import Tab
 from pydoll.constants import By
-from pydoll.exceptions import (
-    ElementNotVisible,
-    WaitElementTimeout,
-    ElementNotFound
-)
+from pydoll.exceptions import ElementNotFound, ElementNotVisible, WaitElementTimeout
 from pywinauto import keyboard
 
 from core.browser.constants import scripts
 from core.browser.constants.selectors import (
+    BaseSelectors,
     CommonSelectors,
     LoginPageSelectors,
-    BaseSelectors
 )
 from core.desktop.nca_layer import NCALayer
 
@@ -41,12 +37,14 @@ class OfficeSudBase:
 
                 return
 
-    async def _goto_next_page(self, tab: Tab, /, button: str, timeout: float = 60) -> None:
+    async def _goto_next_page(
+        self, tab: Tab, /, button: str, timeout: float = 60
+    ) -> None:
         is_next_page = False
         async with asyncio.timeout(timeout):
             while not is_next_page:
                 try:
-                    if await tab.current_url == self.PAGE_URL:
+                    if self.PAGE_URL in await tab.current_url:
                         await self.scroll_down(tab)
                         go_next_button = await tab.find_or_wait_element(
                             By.XPATH, button
@@ -66,7 +64,9 @@ class OfficeSudBase:
         while not clicked:
             try:
                 select_button = await tab.find_or_wait_element(
-                    By.CSS_SELECTOR, LoginPageSelectors.SELECT_EDS, timeout=10
+                    By.CSS_SELECTOR,
+                    LoginPageSelectors.SELECT_EDS,
+                    timeout=10,
                 )
                 await select_button.click()
             except (ElementNotVisible, KeyError):
@@ -87,7 +87,10 @@ class OfficeSudBase:
             while not selected:
                 try:
                     select = await tab.find_or_wait_element(
-                        By.XPATH, xpath, timeout=timeout, find_all=True
+                        By.XPATH,
+                        xpath,
+                        timeout=timeout,
+                        find_all=True,
                     )
                     select_id = select[-1].get_attribute("id")
                     if await self._option_selected(tab, select_id, option):
@@ -107,7 +110,12 @@ class OfficeSudBase:
                     selected = True
 
     async def _set_text(
-        self, tab: Tab, xpath: str, text: str, timeout: int = 30, interval: float = 0.01
+        self,
+        tab: Tab,
+        xpath: str,
+        text: str,
+        timeout: int = 30,
+        interval: float = 0.01,
     ) -> None:
         logger.debug(f"Setting {text} to {xpath}")
         text_set = False
@@ -119,13 +127,24 @@ class OfficeSudBase:
                         By.XPATH, xpath, timeout=timeout // 2
                     )
                     _field_id = _field.get_attribute("id")
+                    _field_selector_type = "id"
+                    if not _field_id:
+                        _field_id = _field.get_attribute("name")
+                        _field_selector_type = "name"
                     await _field.click()
                     await _field.type_text(text, interval=interval)
                     await asyncio.sleep(0.3)
-                    if not await self._is_text_set(tab, field_id=_field_id, text=text):
+                    if not await self._is_text_set(
+                        tab,
+                        field_selector=_field_id,
+                        field_selector_type=_field_selector_type,
+                        text=text,
+                    ):
                         await _field.execute_script(
                             scripts.CLEAR_TEXT_FIELD.format(
-                                input_id=CommonSelectors.INPUT.format(_field_id)
+                                input_id=CommonSelectors.INPUT.format(
+                                    key=_field_selector_type, value=_field_id
+                                )
                             )
                         )
                         continue
@@ -145,18 +164,6 @@ class OfficeSudBase:
         await asyncio.sleep(0.1)
 
     @staticmethod
-    async def upload_files(
-        tab: Tab, selector: str, files: list, timeout: int = 15
-    ) -> None:
-        logger.info(f"Загружаем файлы. Количество файлов: {len(files)}")
-        input_element = await tab.find_or_wait_element(
-            By.CSS_SELECTOR, selector, timeout=timeout
-        )
-        await input_element.set_input_files(files)
-
-        await asyncio.sleep(0.5)
-
-    @staticmethod
     async def upload_file_with_button(
         tab: Tab, selector: str, file: str, timeout: int = 30
     ) -> None:
@@ -174,11 +181,29 @@ class OfficeSudBase:
         keyboard.send_keys("{ENTER}")
 
     @staticmethod
-    async def _element_visible(tab: Tab, *, xpath: str = None, element_id: str = None) -> bool:
+    async def _upload_files(
+        tab: Tab, selector: str, files: list, timeout: int = 15
+    ) -> None:
+        logger.info(f"Загружаем файлы. Количество файлов: {len(files)}")
+        input_element = await tab.find_or_wait_element(
+            By.CSS_SELECTOR, selector, timeout=timeout
+        )
+        await input_element.set_input_files(files)
+
+        await asyncio.sleep(0.5)
+
+    @staticmethod
+    async def _element_visible(
+        tab: Tab, *, xpath: str = None, element_id: str = None
+    ) -> bool:
         if xpath:
-            result = await tab.execute_script(scripts.ELEMENT_VISIBLE_BY_XPATH.format(xpath=xpath))
+            result = await tab.execute_script(
+                scripts.ELEMENT_VISIBLE_BY_XPATH.format(xpath=xpath)
+            )
         else:
-            result = await tab.execute_script(scripts.ELEMENT_VISIBLE_BY_ID.format(element_id=element_id))
+            result = await tab.execute_script(
+                scripts.ELEMENT_VISIBLE_BY_ID.format(element_id=element_id)
+            )
 
         return result["result"]["result"]["value"]
 
@@ -186,19 +211,25 @@ class OfficeSudBase:
     async def _option_selected(tab: Tab, select_id: str, option: str) -> bool:
         result = await tab.execute_script(
             scripts.OPTION_SELECTED.format(
-                select_id=CommonSelectors.SELECT.format(select_id), option=option
+                select_id=CommonSelectors.SELECT.format(select_id),
+                option=option,
             )
         )
         return result["result"]["result"]["value"]
 
     @staticmethod
-    async def _is_text_set(tab: Tab, field_id: str, text: str) -> bool:
-        if "person-phone" in field_id and text != "":
+    async def _is_text_set(
+        tab: Tab, text: str, field_selector: str, field_selector_type: str = "id"
+    ) -> bool:
+        if "person-phone" in field_selector and text != "":
             return True
 
         result = await tab.execute_script(
             scripts.FIELD_TEXT.format(
-                input_id=CommonSelectors.INPUT.format(field_id), text=text
+                input_id=CommonSelectors.INPUT.format(
+                    key=field_selector_type, value=field_selector
+                ),
+                text=text,
             )
         )
 

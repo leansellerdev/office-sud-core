@@ -8,7 +8,7 @@ from pydoll.exceptions import ElementNotVisible
 from core.browser.constants.selectors import FillInfoPageSelectors
 from core.browser.pages.base import OfficeSudBase
 from core.models import SetupParams
-from core.types import ParticipantSide, Dialog
+from core.types import Dialog, ParticipantSide
 
 
 class FillInfoPage(OfficeSudBase):
@@ -19,24 +19,47 @@ class FillInfoPage(OfficeSudBase):
         self.PAGE_URL = self.BASE_URL + "form/requestType2/createRequest.xhtml"
         self.params = params
 
+    async def goto_next_page(self, tab: Tab, timeout: float = 60) -> None:
+        await self._goto_next_page(
+            tab, button=self.selectors.GONEXT_BUTTON, timeout=timeout
+        )
+
     async def fill_statement_info(self, tab: Tab) -> None:
         logger.info("Страница заполнения данных")
         await self.wait_page(tab, self.PAGE_URL)
 
         if self.params.type == "statement":
-            await self._select_option(tab, self.selectors.CATEGORY_GROUP_SELECT,
-                                      self.params.fill_info_page_params.cat_group)
+            await self._select_option(
+                tab,
+                self.selectors.CATEGORY_GROUP_SELECT,
+                self.params.fill_info_page_params.cat_group,
+            )
 
         # Категория дела
-        await self._select_option(tab, self.selectors.CATEGORY_SELECT, self.params.fill_info_page_params.cat)
+        await self._select_option(
+            tab,
+            self.selectors.CATEGORY_SELECT,
+            self.params.fill_info_page_params.cat,
+        )
         # Характер заявления
-        await self._select_option(tab, self.selectors.CHARACTER_SELECT,
-                                  self.params.fill_info_page_params.statement_character)
+        await self._select_option(
+            tab,
+            self.selectors.CHARACTER_SELECT,
+            self.params.fill_info_page_params.statement_character,
+        )
 
         # Область
-        await self._select_option(tab, self.selectors.CITY_SELECT, self.params.fill_info_page_params.district)
+        await self._select_option(
+            tab,
+            self.selectors.CITY_SELECT,
+            self.params.fill_info_page_params.district,
+        )
         # Судебный орган
-        await self._select_option(tab, self.selectors.COURT_SELECT, self.params.fill_info_page_params.court)
+        await self._select_option(
+            tab,
+            self.selectors.COURT_SELECT,
+            self.params.fill_info_page_params.court,
+        )
 
     async def add_participant(self, tab: Tab, _type: int, side: int) -> None:
         """
@@ -49,17 +72,29 @@ class FillInfoPage(OfficeSudBase):
             raise AttributeError("Attribute side must be in (1, 2, 7, 4, 5)")
         try:
             add_participant_button = await tab.find_or_wait_element(
-                By.CSS_SELECTOR, self.selectors.ADD_PARTICIPANT_BUTTON, timeout=10
+                By.CSS_SELECTOR,
+                self.selectors.ADD_PARTICIPANT_BUTTON,
+                timeout=10,
             )
             await add_participant_button.click()
             await asyncio.sleep(3)
 
             if _type == 1:
-                await self._select_option(tab, self.selectors.PARTICIPANT_TYPE_SELECT, "false")
+                await self._select_option(
+                    tab,
+                    self.selectors.PARTICIPANT_TYPE_SELECT,
+                    "false",
+                )
             else:
-                await self._select_option(tab, self.selectors.PARTICIPANT_TYPE_SELECT, "true")
+                await self._select_option(
+                    tab,
+                    self.selectors.PARTICIPANT_TYPE_SELECT,
+                    "true",
+                )
 
-            await self._select_option(tab, self.selectors.PARTICIPANT_SIDE_SELECT, str(side))
+            await self._select_option(
+                tab, self.selectors.PARTICIPANT_SIDE_SELECT, str(side)
+            )
             goto_button = await tab.find_or_wait_element(
                 By.XPATH, self.selectors.PARTICIPANT_GOTO_BUTTON
             )
@@ -71,7 +106,11 @@ class FillInfoPage(OfficeSudBase):
 
     async def fill_jur_data(self, tab: Tab) -> None:
         await asyncio.sleep(1)
-        await self._set_text(tab, self.selectors.ORG_BIN, self.params.fill_info_page_params.org_bin)
+        await self._set_text(
+            tab,
+            self.selectors.ORG_BIN,
+            self.params.fill_info_page_params.org_bin,
+        )
 
         org_search_button = await tab.find_or_wait_element(
             By.XPATH, self.selectors.ORG_SEARCH_BUTTON
@@ -79,9 +118,17 @@ class FillInfoPage(OfficeSudBase):
         await org_search_button.click()
         await asyncio.sleep(1)
 
-        await self._set_text(tab, self.selectors.ORG_FACT_ADDRESS, self.params.fill_info_page_params.org_address)
+        await self._set_text(
+            tab,
+            self.selectors.ORG_FACT_ADDRESS,
+            self.params.fill_info_page_params.org_address,
+        )
         if self.params.fill_info_page_params.org_requisites:
-            await self._set_text(tab, self.selectors.ORG_BANK_DETAILS, self.params.fill_info_page_params.org_requisites)
+            await self._set_text(
+                tab,
+                self.selectors.ORG_BANK_DETAILS,
+                self.params.fill_info_page_params.org_requisites,
+            )
 
         save_button = await tab.find_or_wait_element(
             By.XPATH, self.selectors.JUR_SAVE_BUTTON
@@ -116,10 +163,23 @@ class FillInfoPage(OfficeSudBase):
 
     async def select_dialog_values(self, tab: Tab, dialogs: list[Dialog]) -> None:
         for dialog in dialogs:
-            await self.select_dialog_value(tab, dialog_text=dialog.text, dialog_value=dialog.value, sleep_time=2)
+            await self.select_dialog_value(
+                tab,
+                dialog_text=dialog.text,
+                dialog_value=dialog.value,
+                sleep_time=2,
+            )
 
-    async def select_dialog_value(self, tab: Tab, dialog_text: str, dialog_value: bool, sleep_time: float = None) -> None:
-        dialog_value = 'true' if dialog_value else 'false'
+    async def select_dialog_value(
+        self,
+        tab: Tab,
+        dialog_text: str,
+        dialog_value: bool,
+        sleep_time: float = None,
+    ) -> None:
+        dialog_value = "true" if dialog_value else "false"  # type: ignore
+        logger.debug(f"Setting {dialog_value} to {dialog_text}")
+
         dialog_elements = await tab.find_or_wait_element(
             By.XPATH, self.selectors.MODAL_DIALOG_PANEL, find_all=True
         )
@@ -132,10 +192,12 @@ class FillInfoPage(OfficeSudBase):
                 ).text
                 if dialog_text.lower() in dialog_element_text.lower():
                     quest_block = await dialog_element.find_or_wait_element(
-                        By.CLASS_NAME, self.selectors.QUEST_BLOCK_CONTAINER_CLASS
+                        By.CLASS_NAME,
+                        self.selectors.QUEST_BLOCK_CONTAINER_CLASS,
                     )
                     needed_input = await quest_block.find_or_wait_element(
-                        By.XPATH, self.selectors.DIALOG_VALUE.format(dialog_value=dialog_value)
+                        By.XPATH,
+                        self.selectors.DIALOG_VALUE.format(dialog_value=dialog_value),
                     )
                     await needed_input.click()
                     break
@@ -146,7 +208,7 @@ class FillInfoPage(OfficeSudBase):
             By.XPATH,
             self.selectors.NEXT_QUEST_BUTTONS,
             timeout=10,
-            find_all=True
+            find_all=True,
         )
         for submit_button in submit_buttons:
             if await submit_button.is_visible():
@@ -157,8 +219,7 @@ class FillInfoPage(OfficeSudBase):
         if sleep_time:
             await asyncio.sleep(sleep_time)
 
-    async def goto_next_page(self, tab: Tab, /, timeout: float = 60) -> None:
-        await self._goto_next_page(tab, timeout=timeout, button=self.selectors.GONEXT_BUTTON)
+        logger.success(f"{dialog_value} set to {dialog_text}")
 
     async def trigger_constructor(self, tab: Tab) -> None:
         gonext_button = await tab.find_or_wait_element(

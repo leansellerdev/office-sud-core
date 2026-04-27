@@ -42,12 +42,17 @@ class SigningPage(OfficeSudBase):
         await tab.enable_network_events()
 
         download_button = await tab.find_or_wait_element(
-            By.CSS_SELECTOR, self.selectors.DOWNLOAD_RESULT_FILE_BUTTON, timeout=30
+            By.CSS_SELECTOR,
+            self.selectors.DOWNLOAD_RESULT_FILE_BUTTON,
+            timeout=30,
         )
         await download_button.click()
 
         await asyncio.sleep(1)
-        request_id, notification_code = await self._get_notification_code_from_logs(tab)
+        (
+            request_id,
+            notification_code,
+        ) = await self._get_notification_code_from_logs(tab)
         await tab.fail_request(request_id, error_reason=ErrorReason.ABORTED)
 
         return notification_code
@@ -65,7 +70,7 @@ class SigningPage(OfficeSudBase):
                 notification_code = params["r"][0]
                 break
 
-        return request_id, notification_code
+        return request_id, notification_code  # type: ignore
 
     @staticmethod
     async def _wait_file_to_be_downloaded(

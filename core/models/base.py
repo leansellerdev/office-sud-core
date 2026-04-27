@@ -30,7 +30,7 @@ class FillInfoPageParams(BaseModel):
     court: str
     court_name: str
     org_bin: str
-    org_address: Union[str, None] = None
+    org_address: str
     org_requisites: Union[str, None] = None
     additional_persons: list[AdditionalPerson] = []
 

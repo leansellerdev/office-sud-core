@@ -27,12 +27,23 @@ class SelectOptionsPage(OfficeSudBase):
 
     async def select_options(self, tab: Tab) -> None:
         # Тип производства
-        await self._select_option(tab, self.selectors.CASE_TYPE_SELECT,
-                                  self.params.select_options_page_params.case_type)
+        await self._select_option(
+            tab,
+            self.selectors.CASE_TYPE_SELECT,
+            self.params.select_options_page_params.case_type,
+        )
         # Инстанция
-        await self._select_option(tab, self.selectors.INSTANCE_SELECT, self.params.select_options_page_params.instance)
+        await self._select_option(
+            tab,
+            self.selectors.INSTANCE_SELECT,
+            self.params.select_options_page_params.instance,
+        )
         # Тип документа
         await asyncio.sleep(5)
-        await self._select_option(tab, self.selectors.DOC_TYPE_SELECT, self.params.select_options_page_params.doc_type)
+        await self._select_option(
+            tab,
+            self.selectors.DOC_TYPE_SELECT,
+            self.params.select_options_page_params.doc_type,
+        )
 
         await self._goto_next_page(tab, self.selectors.GONEXT_BUTTON)

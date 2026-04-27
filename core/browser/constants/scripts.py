@@ -55,4 +55,3 @@ ELEMENT_VISIBLE_BY_ID = """
     
     return isVisible;
 """
-

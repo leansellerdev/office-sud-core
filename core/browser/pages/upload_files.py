@@ -2,6 +2,8 @@ import asyncio
 
 from loguru import logger
 from pydoll.browser.tab import Tab
+from pydoll.constants import By
+from pydoll.elements.web_element import WebElement
 
 from core.browser.constants.selectors import CommonSelectors, UploadFilesPageSelectors
 from core.browser.pages.base import OfficeSudBase
@@ -9,28 +11,33 @@ from core.exceptions import StatementError
 from core.models import SetupParams
 
 
-# TODO: Сделать загрузку файлов через кнопку
 class UploadFilesPage(OfficeSudBase):
     selectors = UploadFilesPageSelectors
 
     def __init__(self, params: SetupParams) -> None:
         super().__init__()
-        self.PAGE_URL = self.BASE_URL + "form/requestType2/blankData/other.xhtml"
+        self.PAGE_URL = self.BASE_URL + "form/requestType2/blankData"
         self.params = params
+
+        self.text_paste_interval = 0.005
+
+    async def goto_next_page(self, tab: Tab, timeout: float = 60) -> None:
+        await self._goto_next_page(
+            tab, button=self.selectors.GONEXT_BUTTON, timeout=timeout
+        )
 
     async def set_files(self, tab: Tab, files: list) -> None:
         logger.info("Страница загрузки файлов")
 
         await self.wait_page(tab, self.PAGE_URL)
+        logger.info("Files to upload: {files}".format(files=files))
 
-        await self.fill_fields(tab)
-
-        await self.upload_files(
+        await self._upload_files(
             tab,
             self.selectors.STATEMENT_UPLOAD_INPUT,
             [file for file in files if "Исковое_Заявление" in file],
         )
-        await self.upload_files(
+        await self._upload_files(
             tab,
             self.selectors.FILE_UPLOAD_INPUT,
             [file for file in files if "Исковое_Заявление" not in file],
@@ -52,8 +59,75 @@ class UploadFilesPage(OfficeSudBase):
 
         await self.scroll_down(tab)
 
-    async def fill_fields(self, tab: Tab) -> None:
-        await self._set_text(tab, self.selectors.BASE_REQ_FIELD, self.params.upload_files_page_params.base_req,
-                             interval=0.005)
-        await self._set_text(tab, self.selectors.ADDITIONAL_REQ_FIELD,
-                             self.params.upload_files_page_params.additional_req, interval=0.005)
+    async def fill_base_requirements(self, tab: Tab) -> None:
+        await self._set_text(
+            tab,
+            self.selectors.BASE_REQ_FIELD,
+            self.params.upload_files_page_params.base_req,
+            interval=self.text_paste_interval,
+        )
+        await self._set_text(
+            tab,
+            self.selectors.ADDITIONAL_REQ_FIELD,
+            self.params.upload_files_page_params.additional_req,
+            interval=self.text_paste_interval,
+        )
+
+    async def fill_agreement_info(
+        self,
+        tab: Tab,
+        agreement_date: str,
+        term_date: str,
+        loan_sum: str,
+        termination_info: str,
+        violation_info: str,
+        pretrial_results: str,
+        statement_requirements: list[str],
+    ) -> None:
+        contract_date_input: WebElement = await tab.find_or_wait_element(
+            By.XPATH, self.selectors.CONTRACT_DATE_INPUT, timeout=10
+        )
+        await contract_date_input.type_text(agreement_date)
+        term_date_input: WebElement = await tab.find_or_wait_element(
+            By.XPATH, self.selectors.TERM_DATE_INPUT, timeout=10
+        )
+        await term_date_input.type_text(term_date)
+
+        await self._set_text(tab, self.selectors.LOAN_SUM_INPUT, loan_sum)
+        await self._set_text(
+            tab,
+            self.selectors.TERMINATION_INFO_INPUT,
+            termination_info,
+            interval=self.text_paste_interval,
+        )
+        await self._set_text(
+            tab,
+            self.selectors.VIOLATION_INFO_INPUT,
+            violation_info,
+            interval=self.text_paste_interval,
+        )
+        await self._set_text(
+            tab,
+            self.selectors.PRETRIAL_RESULTS_INPUT,
+            pretrial_results,
+            interval=self.text_paste_interval,
+        )
+
+        for statement_requirement in statement_requirements:
+            await self._add_statement_requirement(tab, statement_requirement)
+            await asyncio.sleep(1)
+
+    async def _add_statement_requirement(
+        self, tab: Tab, statement_requirement: str
+    ) -> None:
+        statement_req_button: WebElement = await tab.find_or_wait_element(
+            By.XPATH, self.selectors.STATEMENT_REQ_BUTTON, timeout=10
+        )
+        await statement_req_button.click()
+        await asyncio.sleep(1)
+
+        await self._set_text(
+            tab,
+            self.selectors.STATEMENT_REQ_TEXTFIELD,
+            statement_requirement,
+        )

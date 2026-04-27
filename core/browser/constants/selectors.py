@@ -2,11 +2,10 @@ class BaseSelectors:
     GONEXT_BUTTON: str = None
 
 
-
 class CommonSelectors(BaseSelectors):
     OPTION = 'option[value = "{}"]'
     SELECT = 'select[id = "{}"]'
-    INPUT = 'input[id = "{}"]'
+    INPUT = 'input[{key} = "{value}"]'
     LOADER = '//div[contains(@class, "loader-card")]'
 
 
@@ -58,9 +57,11 @@ class FillInfoPageSelectors(BaseSelectors):
     JUR_SAVE_BUTTON = '//input[contains(@onclick, "incId") and contains(@class, "btn btn-primary") and contains(@value, "Сохранить")]'
 
     MODAL_DIALOG_PANEL = '//div[contains(@id, "questModalDialogPanel")]'
-    QUEST_BLOCK_CONTAINER_CLASS = 'quest-block-container'
+    QUEST_BLOCK_CONTAINER_CLASS = "quest-block-container"
     NEXT_QUEST_BUTTONS = '//input[@value="Далее" and @type="submit"]'
-    TRIGGER_CONSTRUCTOR_BUTTON = '//a[contains(@onclick, "showQuestionModalDialogLoan()")]'
+    TRIGGER_CONSTRUCTOR_BUTTON = (
+        '//a[contains(@onclick, "showQuestionModalDialogLoan()")]'
+    )
     DIALOG_VALUE = '//input[@value="{dialog_value}"]'
 
     GONEXT_BUTTON = '//a[contains(@onclick, "goNext()")]'
@@ -90,6 +91,18 @@ class UploadFilesPageSelectors(BaseSelectors):
 
     STATEMENT_UPLOAD_INPUT = 'input[type="file"]:not([multiple])'
     FILE_UPLOAD_INPUT = 'input[multiple="multiple"]'
+
+    CONTRACT_DATE_INPUT = '//input[contains(@id, "contract-date-field")]'
+    TERM_DATE_INPUT = '//input[contains(@id, "term-date-field")]'
+    LOAN_SUM_INPUT = '//input[contains(@id, "sum-field")]'
+    TERMINATION_INFO_INPUT = '//input[contains(@id, "termination-field")]'
+    VIOLATION_INFO_INPUT = '//textarea[contains(@id, "essenceVolation-field")]'
+    PRETRIAL_RESULTS_INPUT = '//textarea[contains(@id, "measures-field")]'
+
+    STATEMENT_REQ_BUTTON = '//input[contains(@value, "Добавить") and @class="button button-primary" and @type="submit"]'
+    STATEMENT_REQ_TEXTFIELD = (
+        '//input[contains(@type, "text") and @style="flex: 1" and not(@value)]'
+    )
 
     FILE_TYPE_REJECT = 'span[id="fileTypeRejectAlertMsg"]'
 
