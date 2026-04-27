@@ -7,13 +7,13 @@ from pydoll.constants import By
 from pydoll.exceptions import ElementNotFound, ElementNotVisible, WaitElementTimeout
 from pywinauto import keyboard
 
-from core.browser.constants import scripts
-from core.browser.constants.selectors import (
+from office_sud_core.browser.constants import scripts
+from office_sud_core.browser.constants.selectors import (
     BaseSelectors,
     CommonSelectors,
     LoginPageSelectors,
 )
-from core.desktop.nca_layer import NCALayer
+from office_sud_core.desktop.nca_layer import NCALayer
 
 
 class OfficeSudBase:

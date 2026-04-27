@@ -1,14 +1,14 @@
 import simplejson as json
 
-from core.models import UploadFilesPageParams
-from core.models.base import (
+from office_sud_core.models import UploadFilesPageParams
+from office_sud_core.models.base import (
     AuthParams,
     FillInfoPageParams,
     PaymentPageParams,
     SelectOptionsPageParams,
 )
-from core.models.setup import SetupParams
-from core.models.statement import StatementFillInfoParams
+from office_sud_core.models.setup import SetupParams
+from office_sud_core.models.statement import StatementFillInfoParams
 
 
 def read_config(config_name: str) -> SetupParams:

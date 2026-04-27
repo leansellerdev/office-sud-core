@@ -5,10 +5,13 @@ from pydoll.browser.tab import Tab
 from pydoll.constants import By
 from pydoll.elements.web_element import WebElement
 
-from core.browser.constants.selectors import CommonSelectors, UploadFilesPageSelectors
-from core.browser.pages.base import OfficeSudBase
-from core.exceptions import StatementError
-from core.models import SetupParams
+from office_sud_core.browser.constants.selectors import (
+    CommonSelectors,
+    UploadFilesPageSelectors,
+)
+from office_sud_core.browser.pages.base import OfficeSudBase
+from office_sud_core.exceptions import StatementError
+from office_sud_core.models import SetupParams
 
 
 class UploadFilesPage(OfficeSudBase):

@@ -1,13 +1,13 @@
 from pydantic import BaseModel
 
-from core.models.base import (
+from office_sud_core.models.base import (
     AuthParams,
     FillInfoPageParams,
     PaymentPageParams,
     SelectOptionsPageParams,
     UploadFilesPageParams,
 )
-from core.models.statement import StatementFillInfoParams
+from office_sud_core.models.statement import StatementFillInfoParams
 
 
 class SetupParams(BaseModel):

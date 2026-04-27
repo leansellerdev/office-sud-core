@@ -8,10 +8,9 @@ from pydoll.browser.tab import Tab
 from pydoll.constants import By
 from pydoll.protocol.network.types import ErrorReason
 
-from core.browser.constants.selectors import SigningPageSelectors
-from core.browser.pages import OfficeSudBase
-from core.models import SetupParams
-from settings import PATH
+from office_sud_core.browser.constants.selectors import SigningPageSelectors
+from office_sud_core.browser.pages import OfficeSudBase
+from office_sud_core.models import SetupParams
 
 
 class SigningPage(OfficeSudBase):
@@ -33,7 +32,7 @@ class SigningPage(OfficeSudBase):
         await certificate_choice_button.click()
 
         await self.nca_layer.choose_key(
-            str(PATH / self.params.auth_params.nca_path),
+            self.params.auth_params.nca_path,
             self.params.auth_params.password,
         )
 

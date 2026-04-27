@@ -5,10 +5,10 @@ from pydoll.browser.tab import Tab
 from pydoll.constants import By
 from pydoll.exceptions import ElementNotVisible
 
-from core.browser.constants.selectors import FillInfoPageSelectors
-from core.browser.pages.base import OfficeSudBase
-from core.models import SetupParams
-from core.types import Dialog, ParticipantSide
+from office_sud_core.browser.constants.selectors import FillInfoPageSelectors
+from office_sud_core.browser.pages.base import OfficeSudBase
+from office_sud_core.models import SetupParams
+from office_sud_core.types import Dialog, ParticipantSide
 
 
 class FillInfoPage(OfficeSudBase):

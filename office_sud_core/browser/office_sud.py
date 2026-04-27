@@ -2,15 +2,15 @@ from pydoll.browser import Chrome
 from pydoll.browser.options import ChromiumOptions
 from pydoll.browser.tab import Tab
 
-from core.browser.pages import (
+from office_sud_core.browser.pages import (
     FillInfoPage,
     LoginPage,
     PaymentPage,
     SelectOptionsPage,
     UploadFilesPage,
 )
-from core.browser.pages.signing import SigningPage
-from core.models import SetupParams
+from office_sud_core.browser.pages.signing import SigningPage
+from office_sud_core.models import SetupParams
 
 
 class OfficeSudProcess:

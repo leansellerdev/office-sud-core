@@ -5,9 +5,9 @@ from pydoll.browser.tab import Tab
 from pydoll.constants import By
 from pydoll.exceptions import ElementNotFound
 
-from core.browser.constants.selectors import LoginPageSelectors
-from core.browser.pages.base import OfficeSudBase
-from core.models import SetupParams
+from office_sud_core.browser.constants.selectors import LoginPageSelectors
+from office_sud_core.browser.pages.base import OfficeSudBase
+from office_sud_core.models import SetupParams
 
 
 class LoginPage(OfficeSudBase):

@@ -1,4 +1,4 @@
-from core.models.base import FillInfoPageParams
+from office_sud_core.models.base import FillInfoPageParams
 
 
 class StatementFillInfoParams(FillInfoPageParams):

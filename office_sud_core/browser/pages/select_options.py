@@ -3,9 +3,9 @@ import asyncio
 from loguru import logger
 from pydoll.browser.tab import Tab
 
-from core.browser.constants.selectors import SelectOptionSelectors
-from core.browser.pages.base import OfficeSudBase
-from core.models import SetupParams
+from office_sud_core.browser.constants.selectors import SelectOptionSelectors
+from office_sud_core.browser.pages.base import OfficeSudBase
+from office_sud_core.models import SetupParams
 
 
 class SelectOptionsPage(OfficeSudBase):
