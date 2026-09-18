@@ -1,3 +1,64 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.backends.legacy:build"
+
+[project]
+name = "office-sud"
+version = "1.0.0"
+description = "Python automation library for filing court claims in Kazakhstan's office.sud.kz judicial portal"
+readme = "README.md"
+requires-python = ">=3.11"
+license = { text = "MIT" }
+keywords = [
+    "automation",
+    "court",
+    "kazakhstan",
+    "browser-automation",
+    "digital-signature",
+    "nca-layer",
+]
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Intended Audience :: Developers",
+    "Operating System :: Microsoft :: Windows",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Office/Business",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+]
+dependencies = [
+    "aiofiles>=23.2.1",
+    "aiohttp>=3.12.0",
+    "aiosqlite>=0.21.0",
+    "APScheduler>=3.11.0",
+    "cryptography>=46.0.0",
+    "loguru>=0.7.3",
+    "pillow>=11.3.0",
+    "PyAutoGUI>=0.9.54",
+    "pydantic>=2.12.0",
+    "pydantic-settings>=2.13.0",
+    "pydoll-python>=2.8.0",
+    "PyGetWindow>=0.0.9",
+    "PyMsgBox>=2.0.1",
+    "PyScreeze>=1.0.1",
+    "python-dotenv>=1.2.2",
+    "pywin32>=311",
+    "pywinauto>=0.6.9",
+    "requests>=2.32.0",
+    "simplejson>=3.20.0",
+    "supabase>=2.28.0",
+    "tenacity>=9.1.0",
+]
+
+[project.urls]
+Repository = "https://github.com/your-org/office-sud"
+"Bug Tracker" = "https://github.com/your-org/office-sud/issues"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["office_sud_core*"]
+
 [tool.ruff]
 line-length = 88
 
@@ -6,6 +67,4 @@ quote-style = "double"
 indent-style = "space"
 
 [tool.ruff.lint]
-extend-select = [
-    "I"
-]
+extend-select = ["I"]
