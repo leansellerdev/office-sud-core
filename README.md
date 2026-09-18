@@ -113,7 +113,7 @@ class MyCaseProcess(OfficeSudProcess):
 
     async def run(self, debtor_iin: str, debt_sum: str, state_duty: str) -> None:
         async with self.chrome:
-            self.tab = await self.chrome.get_tab()
+            self.tab = await self.chrome.new_tab()
 
             await self.process_login()
             await self.process_select_options()
