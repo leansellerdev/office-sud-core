@@ -24,6 +24,9 @@ class SigningPage(OfficeSudBase):
         self.params = params
 
     async def sign_statement(self, tab: Tab) -> None:
+        """
+        Open the certificate selection dialog and sign the statement via NCALayer.
+        """
         await self.wait_page(tab, self.PAGE_URL)
 
         certificate_choice_button = await tab.find_or_wait_element(
@@ -37,6 +40,10 @@ class SigningPage(OfficeSudBase):
         )
 
     async def get_notification_code(self, tab: Tab) -> str:
+        """
+        Download the result notification and extract its code from the network request.
+        :return: notification code string from the download URL parameters
+        """
         await self.wait_page(tab, self.RESULT_PAGE)
         await tab.enable_network_events()
 

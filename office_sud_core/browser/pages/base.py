@@ -27,9 +27,18 @@ class OfficeSudBase:
         self.nca_layer = NCALayer()
 
     async def goto_page(self, tab: Tab) -> None:
+        """
+        Navigate to the page. Override in subclasses to set the target URL.
+        """
         pass
 
     async def wait_page(self, tab: Tab, page_url: str, *, timeout: int = 30) -> None:
+        """
+        Block until the tab's current URL contains page_url.
+        :param tab: active browser tab
+        :param page_url: URL substring to wait for
+        :param timeout: maximum seconds to wait before raising TimeoutError
+        """
         async with asyncio.timeout(timeout):
             while True:
                 if page_url not in await tab.current_url:
@@ -60,6 +69,12 @@ class OfficeSudBase:
                     return
 
     async def select_eds(self, tab: Tab, *, nca_path: str, password: str) -> None:
+        """
+        Open the EDS selection dialog and choose the key via NCALayer.
+        :param tab: active browser tab
+        :param nca_path: path to the .p12 key file
+        :param password: key file password
+        """
         clicked = False
         while not clicked:
             try:
@@ -156,10 +171,16 @@ class OfficeSudBase:
 
     @staticmethod
     async def go_back(tab: Tab) -> None:
+        """
+        Navigate the tab one step back in browser history.
+        """
         await tab.execute_script("window.history.back()")
 
     @staticmethod
     async def scroll_down(tab: Tab) -> None:
+        """
+        Scroll the page to the bottom.
+        """
         await tab.execute_script("window.scrollTo(0, document.body.scrollHeight)")
         await asyncio.sleep(0.1)
 
@@ -167,6 +188,13 @@ class OfficeSudBase:
     async def upload_file_with_button(
         tab: Tab, selector: str, file: str, timeout: int = 30
     ) -> None:
+        """
+        Open a native file dialog via a button click and type the file path into it.
+        :param tab: active browser tab
+        :param selector: CSS selector of the button that opens the file dialog
+        :param file: absolute path to the file to upload
+        :param timeout: seconds to wait for the button to appear
+        """
         logger.info(
             f"Загружаем файл с помощью проводника. Имя файла: {file.split('//')[-1]}"
         )

@@ -21,11 +21,17 @@ class SelectOptionsPage(OfficeSudBase):
         self.params = params
 
     async def goto_page(self, tab: Tab) -> None:
+        """
+        Navigate to the case submission options page.
+        """
         logger.info("Страница выбора опций")
         await tab.go_to(self.PAGE_URL)
         await self.wait_page(tab, self.PAGE_URL)
 
     async def select_options(self, tab: Tab) -> None:
+        """
+        Select case type, court instance, and document type from the config, then proceed.
+        """
         # Тип производства
         await self._select_option(
             tab,

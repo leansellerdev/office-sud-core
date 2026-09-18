@@ -20,11 +20,17 @@ class FillInfoPage(OfficeSudBase):
         self.params = params
 
     async def goto_next_page(self, tab: Tab, timeout: float = 60) -> None:
+        """
+        Proceed to the next step of the form.
+        """
         await self._goto_next_page(
             tab, button=self.selectors.GONEXT_BUTTON, timeout=timeout
         )
 
     async def fill_statement_info(self, tab: Tab) -> None:
+        """
+        Fill category group, category, statement character, district, and court from the config.
+        """
         logger.info("Страница заполнения данных")
         await self.wait_page(tab, self.PAGE_URL)
 
@@ -105,6 +111,9 @@ class FillInfoPage(OfficeSudBase):
             return
 
     async def fill_jur_data(self, tab: Tab) -> None:
+        """
+        Fill legal entity details: BIN, actual address, and bank requisites from the config.
+        """
         await asyncio.sleep(1)
         await self._set_text(
             tab,
@@ -137,6 +146,12 @@ class FillInfoPage(OfficeSudBase):
         await asyncio.sleep(3)
 
     async def fill_fiz_data(self, tab: Tab, *, iin: str, phone_number: str) -> None:
+        """
+        Fill individual participant details and proceed to the next page.
+        :param tab: active browser tab
+        :param iin: individual's IIN (12-digit national ID number)
+        :param phone_number: contact phone number (with or without +7 prefix)
+        """
         await self._set_text(tab, self.selectors.PERSON_IIN, str(iin))
 
         person_search_button = await tab.find_or_wait_element(
@@ -162,6 +177,11 @@ class FillInfoPage(OfficeSudBase):
         await self._goto_next_page(tab, self.selectors.GONEXT_BUTTON)
 
     async def select_dialog_values(self, tab: Tab, dialogs: list[Dialog]) -> None:
+        """
+        Answer a list of modal dialog prompts in sequence.
+        :param tab: active browser tab
+        :param dialogs: ordered list of Dialog objects with text and boolean answer
+        """
         for dialog in dialogs:
             await self.select_dialog_value(
                 tab,
@@ -177,6 +197,13 @@ class FillInfoPage(OfficeSudBase):
         dialog_value: bool,
         sleep_time: float = None,
     ) -> None:
+        """
+        Find a visible modal dialog matching dialog_text and click the yes/no radio.
+        :param tab: active browser tab
+        :param dialog_text: substring to match against the dialog's paragraph text
+        :param dialog_value: True for yes/да, False for no/нет
+        :param sleep_time: optional pause in seconds after answering
+        """
         dialog_value = "true" if dialog_value else "false"  # type: ignore
         logger.debug(f"Setting {dialog_value} to {dialog_text}")
 
@@ -222,6 +249,9 @@ class FillInfoPage(OfficeSudBase):
         logger.success(f"{dialog_value} set to {dialog_text}")
 
     async def trigger_constructor(self, tab: Tab) -> None:
+        """
+        Click the statement constructor trigger button to reveal additional form fields.
+        """
         gonext_button = await tab.find_or_wait_element(
             By.XPATH, self.selectors.TRIGGER_CONSTRUCTOR_BUTTON, timeout=5
         )
@@ -230,4 +260,9 @@ class FillInfoPage(OfficeSudBase):
 
     # TODO: универсальный метод для указания данных в зависимости от типа участника (юр./физ. лицо)
     async def fill_participant_data(self, tab: Tab, *, _type: int) -> None:
+        """
+        Fill participant form fields based on participant type.
+        :param tab: active browser tab
+        :param _type: participant type — 1 for individual, 2 for legal entity
+        """
         pass

@@ -25,11 +25,20 @@ class UploadFilesPage(OfficeSudBase):
         self.text_paste_interval = 0.005
 
     async def goto_next_page(self, tab: Tab, timeout: float = 60) -> None:
+        """
+        Proceed to the next step from the file upload page.
+        """
         await self._goto_next_page(
             tab, button=self.selectors.GONEXT_BUTTON, timeout=timeout
         )
 
     async def set_files(self, tab: Tab, files: list) -> None:
+        """
+        Upload statement file and supporting documents to their respective inputs.
+        Raises StatementError if the portal rejects a file type.
+        :param tab: active browser tab
+        :param files: list of absolute file paths to upload
+        """
         logger.info("Страница загрузки файлов")
 
         await self.wait_page(tab, self.PAGE_URL)
@@ -63,6 +72,9 @@ class UploadFilesPage(OfficeSudBase):
         await self.scroll_down(tab)
 
     async def fill_base_requirements(self, tab: Tab) -> None:
+        """
+        Fill the base and additional requirements text fields from the config.
+        """
         await self._set_text(
             tab,
             self.selectors.BASE_REQ_FIELD,
@@ -87,6 +99,17 @@ class UploadFilesPage(OfficeSudBase):
         pretrial_results: str,
         statement_requirements: list[str],
     ) -> None:
+        """
+        Fill loan agreement details and add individual statement requirements.
+        :param tab: active browser tab
+        :param agreement_date: contract conclusion date (DD.MM.YYYY)
+        :param term_date: repayment deadline date (DD.MM.YYYY)
+        :param loan_sum: loan principal amount as a string
+        :param termination_info: description of termination grounds
+        :param violation_info: description of the obligation violation
+        :param pretrial_results: summary of pretrial settlement attempts
+        :param statement_requirements: list of claim requirement strings to add one by one
+        """
         contract_date_input: WebElement = await tab.find_or_wait_element(
             By.XPATH, self.selectors.CONTRACT_DATE_INPUT, timeout=10
         )

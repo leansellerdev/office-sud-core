@@ -28,6 +28,15 @@ class PaymentPage(OfficeSudBase):
         *,
         is_online: bool = False,
     ) -> str | None:
+        """
+        Configure payment: upload the receipt (offline) or initiate online payment, fill amounts, select KBK.
+        :param tab: active browser tab
+        :param debt_sum: total debt amount as a string
+        :param state_duty_sum: state duty amount as a string
+        :param payment: path to the offline payment receipt file; ignored when is_online=True
+        :param is_online: if True, use online payment flow and return the payment code
+        :return: payment code string when is_online=True, None otherwise
+        """
         logger.info("Страница с платежом")
         try:
             await self.wait_page(tab, self.PAGE_URL)
@@ -60,6 +69,14 @@ class PaymentPage(OfficeSudBase):
     async def set_payment_with_button(
         self, tab, debt_sum: str, state_duty_sum: str, payment: str
     ) -> None:
+        """
+        Fallback payment setup using the native file dialog button instead of the file input.
+        Used when the file input element is unavailable after a page refresh.
+        :param tab: active browser tab
+        :param debt_sum: total debt amount as a string
+        :param state_duty_sum: state duty amount as a string
+        :param payment: path to the offline payment receipt file
+        """
         await asyncio.sleep(3)
 
         await self.upload_file_with_button(
@@ -70,6 +87,10 @@ class PaymentPage(OfficeSudBase):
         await self._set_text(tab, self.selectors.STATE_DUTY_SUM_FIELD, state_duty_sum)
 
     async def online_payment(self, tab: Tab) -> str:
+        """
+        Initiate online payment flow, extract the payment code, then confirm payment.
+        :return: payment code string from the payment gateway
+        """
         online_checkbox = await self._find_online_checkbox(tab)
         checked = True if online_checkbox.get_attribute("checked") else False
         if checked:
@@ -102,6 +123,9 @@ class PaymentPage(OfficeSudBase):
         return payment_code
 
     async def goto_next_page(self, tab: Tab, timeout: float = 60) -> None:
+        """
+        Proceed to the next step from the payment page.
+        """
         await self._goto_next_page(
             tab, button=self.selectors.GONEXT_BUTTON, timeout=timeout
         )

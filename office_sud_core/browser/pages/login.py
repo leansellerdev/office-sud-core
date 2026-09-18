@@ -20,6 +20,9 @@ class LoginPage(OfficeSudBase):
 
     @staticmethod
     async def change_language(tab: Tab) -> None:
+        """
+        Switch the portal interface language.
+        """
         language_changed = False
         button = await tab.find_or_wait_element(
             By.CSS_SELECTOR, LoginPageSelectors.LANGUAGE
@@ -36,6 +39,9 @@ class LoginPage(OfficeSudBase):
         logger.info("Язык изменен")
 
     async def creds_login(self, tab: Tab) -> None:
+        """
+        Log in using BIN and password from the auth config.
+        """
         iin_field = await tab.find_or_wait_element(
             By.XPATH, self.selectors.IIN_FIELD_LOGIN
         )
@@ -56,6 +62,10 @@ class LoginPage(OfficeSudBase):
         await login_button.click()
 
     async def nca_login(self, tab: Tab) -> None:
+        """
+        Navigate to the portal and log in via NCALayer digital signature.
+        Skips login if the session is already active.
+        """
         logger.info("Страница логина")
         self.nca_layer.start()
 
